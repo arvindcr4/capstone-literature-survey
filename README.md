@@ -26,7 +26,7 @@
 | `section_2_5_grpo.tex` | Group Relative Policy Optimization |
 | `section_2_6_deepseek_r1.tex` | DeepSeek-R1 |
 | `section2_7_peft.tex` | Parameter-Efficient Fine-Tuning (LoRA) |
-| `section_2_8_mathematical_reasoning_benchmarks.tex` | Math Reasoning Benchmarks (GSM8K, MATH) |
+| `section_2_8_mathematical_reasoning_benchmarks.tex` | Evaluation Benchmarks (GSM8K, MATH, AIME, HumanEval, MBPP, LiveCodeBench, SWE-bench, GPQA, MMLU, OlympiadBench, ARC-AGI, MMMU, AMC, Minerva Math, APPS, CodeContests, MathVista) |
 | `section_2_9_related_work_rl_reasoning.tex` | Related Work (DeepScaleR, SimpleRL-Zoo, TinyZero, DeepCoder) |
 | `section_2_10_infrastructure_rl_training.tex` | Infrastructure for RL Training (Tinker/Atropos) |
 | `section_2_11_scaling_laws.tex` | Scaling Laws for RL Fine-Tuning |

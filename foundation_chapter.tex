@@ -690,7 +690,7 @@ The combination of LoRA with GRPO confers several structural advantages:
 %% ================================================================
 %% Section 2.8: Mathematical Reasoning Benchmarks
 %% ================================================================
-\section{Mathematical Reasoning Benchmarks}
+\section{Evaluation Benchmarks}
 \label{sec:math-benchmarks}
 
 \subsection{GSM8K}
@@ -726,9 +726,104 @@ GSM8K & 1,319 (test) & Grade school & Numeric & $\sim$97\% & Baseline reasoning 
 MATH & 5,000 (test) & Competition & \LaTeX{} (\verb|\boxed{}|) & $>$95\% & Standard evaluation \\
 MATH-500 & 500 & Competition & \LaTeX{} (\verb|\boxed{}|) & $\sim$99\% & Efficient evaluation \\
 AIME 2024 & 30 & Olympiad-track & Integer (0--999) & $\sim$96\% & Frontier discrimination \\
+\midrule
+\multicolumn{6}{l}{\textit{Code Generation \& Software Engineering}} \\
+\midrule
+HumanEval & 164 & Introductory & Pass/Fail (tests) & $\sim$99\% & Code synthesis \\
+MBPP & 974 & Introductory & Pass/Fail (tests) & $\sim$95\% & Code synthesis \\
+LiveCodeBench & 600+ & Competition & Pass/Fail (tests) & $\sim$65\% & Contamination-free code \\
+SWE-bench Verified & 500 & Real-world & Patch resolution & $\sim$72\% & Software engineering \\
+\midrule
+\multicolumn{6}{l}{\textit{Scientific \& General Reasoning}} \\
+\midrule
+GPQA Diamond & 198 & Graduate & Multiple choice & $\sim$92\% & Expert-level science \\
+MMLU-Pro & 12,000+ & Undergraduate+ & Multiple choice (10) & $\sim$85\% & General knowledge \\
+OlympiadBench & 8,476 & Olympiad & Open-ended & $\sim$60\% & Multimodal science \\
+ARC-AGI-2 & 400 & Abstract & Grid transform & $<$10\% & Fluid intelligence \\
+MMMU & 11,500 & Expert & Multiple choice & $\sim$78\% & Multimodal reasoning \\
+\midrule
+\multicolumn{6}{l}{\textit{Additional Math \& Code Datasets}} \\
+\midrule
+AMC 10/12 & 25 each & High school & Multiple choice (5) & $\sim$95\% & Mid-tier math \\
+Minerva Math & 272 & University & Open-ended & $\sim$90\% & STEM reasoning \\
+APPS & 10,000 & Mixed & Pass/Fail (tests) & $\sim$80\% & Algorithmic code \\
+CodeContests & 13,328 & Competition & Pass/Fail (tests) & $\sim$45\% & Competitive programming \\
+MathVista & 6,141 & Mixed & Mixed & $\sim$70\% & Visual math \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{Code Generation Benchmarks}
+
+\subsubsection{HumanEval and MBPP}
+
+HumanEval \cite{chen2021humaneval} is a benchmark of 164 hand-crafted Python programming problems introduced by OpenAI. Each problem includes a function signature, a docstring specification, and a suite of unit tests. The model must synthesize a correct function body from the docstring; evaluation uses the \emph{pass@k} metric, measuring whether at least one of $k$ generated samples passes all test cases. At release, Codex-12B achieved 28.8\% pass@1; as of early 2026, frontier models exceed 99\%.
+
+The Mostly Basic Python Problems (MBPP) benchmark \cite{austin2021mbpp} complements HumanEval with 974 crowd-sourced Python programming tasks targeting introductory-level skills. Each task provides a natural language description and three test cases. MBPP tests a broader distribution of basic programming patterns than HumanEval. Both benchmarks have approached saturation for frontier models, leading to the development of enhanced variants (HumanEval+ and MBPP+) with expanded test suites that expose edge-case failures \cite{liu2024humanevalplus}.
+
+\subsubsection{LiveCodeBench}
+
+LiveCodeBench \cite{jain2024livecodebench}, published at ICLR 2025, addresses the critical problem of \emph{data contamination} in code benchmarks. It continuously collects new competitive programming problems from LeetCode, AtCoder, and Codeforces after a given cutoff date, ensuring that problems were not present in any model's training data. Beyond code generation, LiveCodeBench evaluates self-repair, code execution prediction, and test output prediction capabilities. The benchmark currently hosts over 600 problems and has been instrumental in detecting contamination across models including GPT-4o, Claude, and DeepSeek. DeepCoder-14B, a GRPO+-trained model, achieved 60.6\% on LiveCodeBench \cite{deepcoder2025}, demonstrating the applicability of RL-based training to code reasoning.
+
+\subsubsection{SWE-bench}
+
+SWE-bench \cite{jimenez2024swebench}, published at ICLR 2024, evaluates whether language models can resolve real-world GitHub issues by generating code patches. The benchmark sources task instances from popular open-source Python repositories, each consisting of a GitHub issue description and a test suite that validates the fix. The full benchmark contains 2,294 instances; the \emph{SWE-bench Verified} subset of 500 instances has been validated by human software engineers from OpenAI to ensure solvability and unambiguous specifications.
+
+SWE-bench represents a qualitative shift from function-level code generation to repository-level software engineering---models must navigate multi-file codebases, understand project conventions, and produce patches that pass both new and regression tests. As of early 2026, the strongest agentic systems achieve approximately 72\% on SWE-bench Verified. SWE-bench has become the de facto standard for evaluating AI coding agents, and its multimodal and multilingual extensions further broaden the evaluation scope.
+
+\subsection{Scientific and General Reasoning Benchmarks}
+
+\subsubsection{GPQA Diamond}
+
+The Graduate-Level Google-Proof Q\&A (GPQA) benchmark \cite{rein2024gpqa}, developed by researchers at NYU and Anthropic, evaluates expert-level scientific reasoning. The \emph{Diamond} subset consists of 198 multiple-choice questions in biology, physics, and chemistry, crafted by PhD-level domain experts and validated through a rigorous multi-stage protocol. Questions are designed to be ``Google-proof''---skilled non-experts with unrestricted internet access achieve only $\sim$34\% accuracy, while domain experts score $\sim$65--70\%.
+
+GPQA Diamond has served as a critical benchmark for tracking the frontier of scientific reasoning in LLMs. At launch, GPT-4 achieved only $\sim$39\%. By mid-2024, OpenAI's o1 reached $\sim$77\%, surpassing human expert performance. As of early 2026, top models exceed 92\%. The benchmark's relevance to RL-trained reasoning models is significant: DeepSeek-R1 achieved 71.5\% on GPQA Diamond, demonstrating that GRPO-based training can enhance scientific reasoning beyond mathematics.
+
+\subsubsection{MMLU and MMLU-Pro}
+
+The Massive Multitask Language Understanding (MMLU) benchmark \cite{hendrycks2021mmlu} evaluates knowledge and reasoning across 57 diverse subjects spanning STEM, humanities, social sciences, and professional domains. Each subject contains multiple-choice questions at difficulty levels ranging from elementary to advanced professional. MMLU has been one of the most widely cited LLM benchmarks, though frontier models now routinely exceed 90\%, reducing its discriminative power.
+
+MMLU-Pro \cite{wang2024mmlupro} addresses these limitations by expanding answer choices from 4 to 10, eliminating trivially solvable questions, and focusing on reasoning-intensive tasks. The resulting benchmark of over 12,000 questions causes a 16--33\% accuracy drop compared to original MMLU, restoring discriminative power. DeepSeek-R1 achieved 85.5\% on MMLU, demonstrating that RL-trained reasoning capabilities transfer beyond mathematics to general knowledge domains.
+
+\subsubsection{OlympiadBench}
+
+OlympiadBench \cite{he2024olympiadbench}, presented at ACL 2024, is a bilingual (English--Chinese) multimodal benchmark comprising 8,476 Olympiad-level problems in mathematics and physics. Unlike MATH or AIME, which are text-only, OlympiadBench includes problems with diagrams, graphs, and figures that require visual understanding. Problems are drawn from international science Olympiads and national competitions, with detailed step-by-step solutions provided for evaluation.
+
+The benchmark is particularly relevant to the study of RL-trained reasoning models because it tests whether mathematical reasoning capabilities transfer to problems requiring both symbolic manipulation and visual interpretation. Frontier reasoning models achieve approximately 60\% accuracy, indicating substantial room for improvement and preserving discriminative power for evaluating future RL-enhanced systems.
+
+\subsubsection{ARC-AGI}
+
+The Abstraction and Reasoning Corpus (ARC-AGI) \cite{chollet2019arc}, introduced by Fran\c{c}ois Chollet, evaluates \emph{fluid intelligence}---the ability to solve novel problems without prior domain-specific knowledge. Each task presents a small number of input--output grid pairs as demonstrations; the model must infer the underlying transformation rule and apply it to a held-out test grid. ARC-AGI is designed to resist memorisation: tasks require recognising abstract patterns (symmetry, counting, object manipulation) that are trivial for humans but remain extremely challenging for LLMs.
+
+ARC-AGI-1 was the benchmark that pinpointed the moment in late 2024 when AI systems moved beyond pure memorisation, with OpenAI's o3-preview achieving a breakthrough score. ARC-AGI-2, released in March 2025, is substantially harder: pure LLMs score 0\%, and public reasoning systems achieve only single-digit accuracy, while every task has been solved by at least two humans in under two attempts. ARC-AGI provides a complementary evaluation axis to mathematical benchmarks by testing general abstract reasoning rather than domain-specific knowledge.
+
+\subsubsection{MMMU}
+
+The Massive Multi-discipline Multimodal Understanding (MMMU) benchmark \cite{yue2024mmmu} evaluates multimodal models on 11,500 expert-level questions spanning 30 subjects across six disciplines (Art \& Design, Business, Science, Health \& Medicine, Humanities, and Technology \& Engineering). Each question requires understanding images---charts, diagrams, maps, chemical structures, medical scans, or artwork---alongside textual reasoning.
+
+MMMU is particularly important for evaluating whether RL-trained reasoning capabilities extend to multimodal settings. At release, frontier models achieved approximately 56\%; by early 2026, the best systems reach $\sim$78\%, indicating that multimodal expert-level reasoning remains an active challenge. The benchmark has become the standard evaluation for vision-language models and is increasingly relevant as GRPO-style training is extended to multimodal architectures.
+
+\subsection{Additional Evaluation Datasets}
+
+\subsubsection{AMC 10/12}
+
+The American Mathematics Competitions (AMC 10 and AMC 12) are widely-administered pre-AIME competitions consisting of 25 multiple-choice problems each, with 75-minute time limits. AMC problems are generally easier than AIME but harder than GSM8K, filling a useful difficulty gap. Problems test algebra, geometry, combinatorics, and number theory at the high school level. SimpleRL-Zoo \cite{zeng2025simplerl} uses AMC as one of its standard evaluation benchmarks, reporting that GRPO-trained models show consistent improvements across the AMC difficulty range.
+
+\subsubsection{Minerva Math}
+
+The Minerva Math benchmark, curated from the evaluation suite of Google's Minerva model \cite{lewkowycz2022minerva}, consists of quantitative reasoning problems drawn from STEM courses including calculus, linear algebra, probability, and physics. Problems require multi-step symbolic computation and domain knowledge beyond the competition-math style of MATH and AIME. Minerva Math has been adopted as a standard evaluation benchmark by several RL-for-reasoning works, including SimpleRL-Zoo and AceReason-Nemotron, providing coverage of university-level mathematical reasoning that complements the competition-oriented benchmarks.
+
+\subsubsection{APPS and CodeContests}
+
+APPS \cite{hendrycks2021apps} (Automated Programming Progress Standard) consists of 10,000 coding problems collected from open-access coding websites such as Codeforces and Kattis, spanning three difficulty levels: introductory, interview, and competition. Each problem includes multiple test cases for evaluation, and solutions require understanding of algorithms, data structures, and mathematical reasoning.
+
+CodeContests \cite{li2022codecontests}, introduced by DeepMind, is a competitive programming benchmark drawn from Codeforces contests with additional problems from other platforms. It includes 13,328 problems with extensive test cases (both public and hidden). Both benchmarks evaluate a model's ability to translate natural language problem descriptions into correct programs, testing algorithmic reasoning---a capability closely related to the chain-of-thought reasoning that GRPO training aims to enhance.
+
+\subsubsection{MathVista}
+
+MathVista \cite{lu2024mathvista} is a consolidated mathematical reasoning benchmark designed to evaluate models on tasks requiring \emph{visual} mathematical understanding. It aggregates 6,141 problems from 28 existing datasets and 3 newly created datasets, spanning five primary mathematical reasoning types: algebraic reasoning, arithmetic reasoning, geometry reasoning, numeric common sense, and statistical reasoning. Problems include function plots, geometric diagrams, tables, bar charts, and scientific figures.
+
+MathVista bridges the gap between text-only math benchmarks (GSM8K, MATH) and general multimodal benchmarks (MMMU), providing targeted evaluation of whether mathematical reasoning capabilities extend to visual inputs. At release, GPT-4V achieved 49.9\%; as of early 2026, frontier multimodal reasoning models reach approximately 70\%, indicating ongoing challenges in visual mathematical reasoning.
 
 
 %% ================================================================
@@ -865,7 +960,7 @@ The foundational paradigm of \textbf{RLHF with PPO} established that human prefe
 
 \textbf{Parameter-efficient fine-tuning} via LoRA~\cite{hu2021lora} and QLoRA~\cite{dettmers2023qlora} has been indispensable in democratising access to RL training, making GRPO feasible on academic-grade hardware.
 
-\textbf{Mathematical reasoning benchmarks}---GSM8K~\cite{cobbe2021gsm8k} and MATH~\cite{hendrycks2021math}---serve as canonical testbeds with verifiable ground-truth answers enabling purely rule-based reward computation.
+\textbf{Evaluation benchmarks} spanning mathematical reasoning (GSM8K, MATH, AIME, AMC, Minerva Math, OlympiadBench, MathVista), code generation (HumanEval, LiveCodeBench, SWE-bench, APPS, CodeContests), and scientific/general reasoning (GPQA Diamond, MMLU-Pro, MMMU, ARC-AGI) collectively provide verifiable ground-truth answers enabling rule-based reward computation and comprehensive capability assessment.
 
 A \textbf{growing ecosystem of open-source reproductions}---TinyZero~\cite{wen2025tinyzero}, SimpleRL-Zoo~\cite{zeng2025simplerl}, DeepScaleR~\cite{luo2025deepscaler}, and DeepCoder~\cite{xu2025deepcoder}---has validated that GRPO-based training can be replicated at various scales using open data and commodity hardware.
 
